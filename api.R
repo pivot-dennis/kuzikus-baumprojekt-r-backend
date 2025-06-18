@@ -97,7 +97,7 @@ if (generation$includeQrCode) {{
         "Gültig bis: ", certificate$expiryDate
       )
       # Verwende die korrekte Funktion aus dem qrcode Paket
-      qr_code_data <- qrcode::qrcode_gen(qr_data, plot = FALSE)
+      qr_code_data <- qr_code(qr_data)
     }}
   }}, error = function(e) {{
     cat("Fehler bei QR-Code-Generierung:", e$message, "\\n")
@@ -148,8 +148,8 @@ if (generation$includeMetadata && !is.null(metadata)) {{
   cat("**Software:** ", metadata$software, "\\n")
   
   if (generation$includeLocation && !is.null(metadata$gpsLatitude) && !is.null(metadata$gpsLongitude)) {{
-    lat_str <- formatGPS(metadata$gpsLatitude)
-    lon_str <- formatGPS(metadata$gpsLongitude)
+    lat_str <- metadata$gpsLatitude[1] + metadata$gpsLatitude[2]/60 + metadata$gpsLatitude[3]/3600
+    lon_str <- metadata$gpsLongitude[1] + metadata$gpsLongitude[2]/60 + metadata$gpsLongitude[3]/3600
     cat("**Standort:** ", lat_str, " / ", lon_str, "\\n")
   }}
 }}
