@@ -1,0 +1,99 @@
+---
+title: "Baum-Zertifikat"
+output: pdf_document
+geometry: margin=2cm
+fontsize: 11pt
+params:
+  certificate: null
+  imageBase64: null
+  metadata: null
+  generation: null
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(base64enc)
+library(qrcode)
+library(knitr)
+
+# Parameter extrahieren
+certificate <- params$certificate
+imageBase64 <- params$imageBase64
+metadata <- params$metadata
+generation <- params$generation
+
+# QR-Code generieren falls gewünscht
+qr_code_data <- NULL
+if (generation$includeQrCode) {
+  qr_data <- paste0(
+    "Baum-ID: ", certificate$treeId, "\n",
+    "Besitzer: ", certificate$owner, "\n",
+    "Anlass: ", certificate$occasion, "\n",
+    "Gültig bis: ", certificate$expiryDate
+  )
+  qr_code_data <- qrcode_gen(qr_data, plot = FALSE)
+}
+```
+
+# Baum-Zertifikat
+
+## Zertifikatsdaten
+
+**Besitzer:** `r certificate$owner`  
+**Anlass:** `r certificate$occasion`  
+**Baum-ID:** `r certificate$treeId`  
+**Gültig bis:** `r certificate$expiryDate`  
+**Fotograf:** `r certificate$photographer`  
+**Erstellt am:** `r as.Date(certificate$createdAt)`
+
+```{r image, echo=FALSE}
+# Bild einbetten falls vorhanden
+if (!is.null(imageBase64) && nchar(imageBase64) > 0) {
+  tryCatch({
+    # Base64-Daten extrahieren (ohne data:image/... prefix)
+    base64_data <- sub("^data:image/[^;]+;base64,", "", imageBase64)
+    
+    # Temporäre Bilddatei erstellen
+    temp_img <- tempfile(fileext = ".jpg")
+    writeBin(base64enc::base64decode(base64_data), temp_img)
+    
+    # Bild einbetten
+    include_graphics(temp_img, dpi = 300)
+    
+    # Temporäre Datei löschen
+    unlink(temp_img)
+  }, error = function(e) {
+    cat("Fehler beim Bild einbetten:", e$message, "\n")
+  })
+}
+```
+
+```{r metadata, echo=FALSE}
+# Metadaten anzeigen falls gewünscht
+if (generation$includeMetadata && !is.null(metadata)) {
+  cat("## Bildmetadaten\n\n")
+  cat("**Aufnahmedatum:** ", as.POSIXct(metadata$dateTime, format="%Y-%m-%dT%H:%M:%S"), "\n")
+  cat("**Kamera:** ", metadata$make, " ", metadata$model, "\n")
+  cat("**Auflösung:** ", metadata$imageWidth, " x ", metadata$imageHeight, " Pixel\n")
+  cat("**Software:** ", metadata$software, "\n")
+  
+  if (generation$includeLocation && !is.null(metadata$gpsLatitude) && !is.null(metadata$gpsLongitude)) {
+    lat_str <- formatGPS(metadata$gpsLatitude)
+    lon_str <- formatGPS(metadata$gpsLongitude)
+    cat("**Standort:** ", lat_str, " / ", lon_str, "\n")
+  }
+}
+```
+
+```{r qrcode, echo=FALSE}
+# QR-Code anzeigen falls gewünscht
+if (generation$includeQrCode && !is.null(qr_code_data)) {
+  cat("## QR-Code\n\n")
+  plot(qr_code_data, col = c("white", "black"), 
+       main = "Scan für Zertifikatsdetails", 
+       cex.main = 0.8)
+}
+```
+
+---
+*Dieses Zertifikat wurde automatisch generiert und ist gültig bis zum angegebenen Datum.*

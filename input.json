@@ -1,0 +1,35 @@
+{
+  "certificate": {
+    "owner": "Dennis Schaible",
+    "occasion": "Hochzeit",
+    "expiryDate": "2026-06-17",
+    "treeId": "VE-229",
+    "photographer": "Friedrich",
+    "createdAt": "2025-06-18T06:08:58.672Z"
+  },
+  "image": {
+    "fileName": "metadata_test2.jpeg",
+    "fileSize": 2109683,
+    "fileType": "image/jpeg",
+    "hasMetadata": true,
+    "base64Data": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgEASABIAAD/..."
+  },
+  "metadata": {
+    "dateTime": "2025-06-18T05:24:36.000Z",
+    "make": "Apple",
+    "model": "iPhone 14 Pro",
+    "imageWidth": 4032,
+    "imageHeight": 3024,
+    "gpsLatitude": [9, 33, 12.08],
+    "gpsLongitude": [100, 3, 0.53],
+    "software": "18.5",
+    "copyright": null
+  },
+  "generation": {
+    "format": "pdf",
+    "template": "tree-certificate",
+    "includeQrCode": true,
+    "includeMetadata": true,
+    "includeLocation": true
+  }
+}
