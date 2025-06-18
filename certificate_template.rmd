@@ -1,0 +1,166 @@
+---
+title: "Baum-Zertifikat"
+output: pdf_document
+geometry: margin=2cm
+fontsize: 11pt
+params:
+  certificate: null
+  imageBase64: null
+  metadata: null
+  generation: null
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(base64enc)
+library(qrcode)
+library(knitr)
+```
+
+```{r}
+# Parameter extrahieren
+certificate <- params$certificate
+imageBase64 <- params$image
+metadata <- params$metadata
+generation <- params$generation
+```
+
+# Baum-Zertifikat
+
+```{r}
+tryCatch({
+     include_graphics("static_content/logo-placeholder.jpg", dpi = 300)
+  }, error = function(e) {
+    cat("Error while attaching logo image:", e$message, "\n")
+  })
+
+```
+Sant: This marks A
+
+```{r}
+tryCatch({
+     include_graphics("static_content/background-placeholder.png", dpi = 300)
+  }, error = function(e) {
+    cat("Error while attaching background image:", e$message, "\n")
+  })
+
+```
+SM: This marks F
+
+
+## Zertifikatsdaten
+
+**Besitzer:** `r certificate$owner`  
+**Anlass:** `r certificate$occasion`  
+**Baum-ID:** `r certificate$treeId`  
+**Gültig bis:** `r certificate$expiryDate`  
+**Fotograf:** `r certificate$photographer`  
+**Erstellt am:** `r as.Date(certificate$createdAt)`
+
+Sant: This marks B,C,E,M, (I don't know about D/K yet. Ask Denis)
+
+```{r, results='asis'}
+text <- readLines("static_content/static_text.txt")
+cat(paste(text, collapse = "\n"))
+```
+Sant: This marks H
+
+
+```{r image, echo=FALSE}
+# Bild einbetten falls vorhanden
+if (!is.null(imageBase64) && nchar(imageBase64$base64Data) > 0) {
+  tryCatch({
+    # Base64-Daten extrahieren (ohne data:image/... prefix)
+    base64_data <- sub("^data:image/[^;]+;base64,", "", imageBase64$base64Data)
+    
+    # Temporäre Bilddatei erstellen
+    random_string <- paste0(sample(c(letters, LETTERS, 0:9), 10, replace = TRUE), collapse = "")
+    temp_img <- paste0("temp_images/", random_string, ".jpg")
+    writeBin(base64enc::base64decode(base64_data), temp_img)
+    
+    # Bild einbetten
+    include_graphics(temp_img, dpi = 300)
+  }, error = function(e) {
+    cat("Fehler beim Bild einbetten:", e$message, "\n")
+  })
+}
+```
+Sant: This marks G (tree image)
+
+
+
+```{r metadata, results='asis'}
+# Metadaten anzeigen falls gewünscht
+if (generation$includeMetadata && !is.null(metadata)) {
+  cat("## Bildmetadaten\n\n")
+  cat("**Aufnahmedatum:** ", as.POSIXct(metadata$dateTime, format="%Y-%m-%dT%H:%M:%S"), "\n\n")
+  cat("**Kamera:** ", metadata$make, " ", metadata$model, "\n\n")
+  cat("**Auflösung:** ", metadata$imageWidth, " x ", metadata$imageHeight, " Pixel\n\n")
+  cat("**Software:** ", metadata$software, "\n\n")
+}
+```
+
+Sant: This marks J (tree coordinates). L can be added here if Denis sends photographer name in metadata
+
+
+```{r qrcode, results='asis'}
+if (generation$includeLocation && !is.null(metadata$gpsLatitude) && !is.null(metadata$gpsLongitude)) {
+      lat_str_decimal <- as.character(metadata$gpsLatitude[[1]] + metadata$gpsLatitude[[2]]/60 + metadata$gpsLatitude[[3]]/3600)
+      lon_str_decimal <- as.character(metadata$gpsLongitude[[1]] + metadata$gpsLongitude[[2]]/60 + metadata$gpsLongitude[[3]]/3600)
+
+      lat_str <- sprintf("%d° %d' %0.2f",
+                   metadata$gpsLatitude[[1]],
+                   metadata$gpsLatitude[[2]],
+                   metadata$gpsLatitude[[3]])
+
+      lon_str <- sprintf("%d° %d' %0.2f",
+                   metadata$gpsLongitude[[1]],
+                   metadata$gpsLongitude[[2]],
+                   metadata$gpsLongitude[[3]])
+    cat("**Standort:** ", lat_str, " / ", lon_str, "\n\n")
+    
+    google_maps_link <- paste0("https://www.google.com/maps/?q=",lat_str_decimal,",",lon_str_decimal)
+
+    # QR-Code anzeigen falls gewünscht
+    if (generation$includeQrCode) {
+      qr_code_data <- NULL
+      
+      tryCatch({
+          # Prüfen ob qrcode Paket verfügbar ist
+          if (!require(qrcode, quietly = TRUE)) {
+            cat("qrcode package not available, skipping QR code generation\n")
+          } else {
+            # Verwende die korrekte Funktion aus dem qrcode Paket
+            qr_code_data <- qr_code(google_maps_link)
+          }
+        }, error = function(e) {
+          cat("Fehler bei QR-Code-Generierung:", e$message, "\n")
+        })
+      }
+      
+    
+      cat("## QR-Code\n\n")
+      plot(qr_code_data, col = c("white", "black"), 
+           main = "Scan für Zertifikatsdetails", 
+           cex.main = 0.8)
+    
+    cat("Link: ", google_maps_link, "\n\n")
+  } else {
+    cat("TODO: ERROR No valid coordinates found\n")
+  }
+```
+Sant: This marks 'I' (Both qr code and google maps link)
+
+
+---
+*Dieses Zertifikat wurde automatisch generiert und ist gültig bis zum angegebenen Datum.*
+
+
+
+Sant: Items left:
+L - tree photographer, Dennis should add this to the metadata and use it from there
+
+Cleanup in the handler code (api.R)
