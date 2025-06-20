@@ -129,7 +129,7 @@ metadata_to_show_latex <- paste0(
       "\\textbf{Fotograf(in):} ", certificate$photographer, "\\\\",
       "\\textbf{Standort:} ", lat_str, " , ", lon_str, "\\\\",
       "\\vspace{0.2cm}", # small vertical space
-      "\\textbf{Google Maps-Link:} ", google_maps_link, "\\\\"
+      "\\textbf{Google Maps-Link:} \\url{", google_maps_link, "}\\\\"
     )
 
 qr_img = paste0("temp_images/qr_", random_string, ".png")
