@@ -1,7 +1,90 @@
-\usepackage{background}
-\backgroundsetup{
-  scale=1,
-  angle=0,
-  opacity=1,
-  contents={\includegraphics[width=\paperwidth,height=\paperheight]{static_content/background-placeholder.jpg}}
+% HEADER: Custom Page Style
+%\geometry{top=2.5cm, bottom=2.5cm, left=2cm, right=2cm}    % For custom margins
+\geometry{margin=1.75cm}
+
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{eso-pic} % for background image
+\usepackage{lipsum}  % for dummy text if needed
+\usepackage{everypage}
+\usepackage{tikz}
+\usepackage{atbegshi}
+\usepackage{svg}
+
+% === BACKGROUND IMAGE ===
+\AtBeginShipout{\AtBeginShipoutAddToBox{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=center,inner sep=0pt] at (current page.center) {\includegraphics[width=\paperwidth,height=\paperheight]{static_content/background-low.pdf}};
+  \end{tikzpicture}%
+}}
+
+
+% === Page Style ===
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{50pt}
+\setlength{\headsep}{20pt}
+
+% LEFT: Logo
+\fancyhead[L]{\includegraphics[width=5cm]{static_content/company-logo.png}}
+
+% CENTER: Title from YAML
+\fancyhead[C]{\textbf{\LARGE Baum-Zertifikat}}
+
+% RIGHT: Dynamic multiline
+\fancyhead[R]{%
+\vspace{8pt}  % 🔼 Tweak this value as needed
+  \begin{minipage}[t]{0.4\textwidth}
+    \raggedleft
+    \rightmark
+  \end{minipage}
 }
+
+
+% === Full-page-centered two-column layout ===
+\newcommand{\centeredTwoCol}[2]{
+  \vspace*{1em}
+  \noindent
+  \begin{minipage}[c][0.35\textheight][c]{\textwidth} % 0.35 -> use 35% of the page's height for this two-column block
+    \begin{minipage}[c]{0.48\textwidth}
+      \centering
+      #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.48\textwidth}
+      \raggedright
+      #2
+    \end{minipage}
+  \end{minipage}
+  \par
+}
+% 1 - tree image (left)
+% 2 - tree metadata (right)
+
+
+% Signature block with adjustable spacing
+\newcommand{\signatureBlock}[6]{%
+  \vspace{2em} % Adjust this to set spacing above the signatures
+  \noindent
+  \begin{minipage}[t]{0.48\textwidth}
+    \centering
+    \includegraphics[width=50pt]{#1} \\[0.5em]   % Adjust signature size (width) here
+    \textbf{#2} \\ 
+    \textit{#3}
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.48\textwidth}
+    \centering
+    \includegraphics[width=50pt]{#4} \\[0.5em]
+    \textbf{#5} \\
+    \textit{#6}
+  \end{minipage}%
+  \par
+}
+
+% FOOTER
+\setlength{\footskip}{8pt}  % Default is ~12pt, increase to send content down lower
+\fancyfoot[C]{\input{static_content/footer.txt}}
+
+% Enforce headers/footers on first page too
+\thispagestyle{fancy}

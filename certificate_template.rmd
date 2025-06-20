@@ -1,6 +1,10 @@
 ---
-title: "Baum-Zertifikat"
-output: pdf_document
+output:
+  pdf_document:
+    latex_engine: xelatex
+    includes:
+      in_header: header.tex
+    keep_tex: true
 geometry: margin=2cm
 fontsize: 11pt
 params:
@@ -9,6 +13,7 @@ params:
   metadata: null
   generation: null
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
@@ -26,141 +31,184 @@ certificate <- params$certificate
 imageBase64 <- params$image
 metadata <- params$metadata
 generation <- params$generation
+location <- params$location
 ```
 
-# Baum-Zertifikat
-
-```{r}
-tryCatch({
-     include_graphics("static_content/logo-placeholder.jpg", dpi = 300)
-  }, error = function(e) {
-    cat("Error while attaching logo image:", e$message, "\n")
-  })
-
-```
-Sant: This marks A
-
-```{r}
-tryCatch({
-     include_graphics("static_content/background-placeholder.png", dpi = 300)
-  }, error = function(e) {
-    cat("Error while attaching background image:", e$message, "\n")
-  })
-
-```
-SM: This marks F
-
-
-## Zertifikatsdaten
-
-**Besitzer:** `r certificate$owner`  
-**Anlass:** `r certificate$occasion`  
-**Baum-ID:** `r certificate$treeId`  
-**Gültig bis:** `r certificate$expiryDate`  
-**Fotograf:** `r certificate$photographer`  
-**Erstellt am:** `r as.Date(certificate$createdAt)`
-
-Sant: This marks B,C,E,M, (I don't know about D/K yet. Ask Denis)
 
 ```{r, results='asis'}
-text <- readLines("static_content/static_text.txt")
-cat(paste(text, collapse = "\n"))
-```
-Sant: This marks H
+# A(logo) and F(background image) are handled in header.tex
 
+# For B,C,D,E,M
+# Top-right
+cat("\\markright{",
+    paste0(
+      "Besitzer: ", certificate$owner, "\\\\",
+      "Anlass: ", certificate$occasion, "\\\\",
+      "Baum: ", certificate$treeId, "\\\\",
+      "Gültig bis: ", certificate$expiryDate, "\\\\",
+      "Erstellt am: ", as.Date(certificate$createdAt), "\\\\"
+    ),
+    "}")
+# use \\\\ for new line in \markright
 
-```{r image, echo=FALSE}
-# Bild einbetten falls vorhanden
-if (!is.null(imageBase64) && nchar(imageBase64$base64Data) > 0) {
-  tryCatch({
-    # Base64-Daten extrahieren (ohne data:image/... prefix)
-    base64_data <- sub("^data:image/[^;]+;base64,", "", imageBase64$base64Data)
-    
-    # Temporäre Bilddatei erstellen
-    random_string <- paste0(sample(c(letters, LETTERS, 0:9), 10, replace = TRUE), collapse = "")
-    temp_img <- paste0("temp_images/", random_string, ".jpg")
-    writeBin(base64enc::base64decode(base64_data), temp_img)
-    
-    # Bild einbetten
-    include_graphics(temp_img, dpi = 300)
-  }, error = function(e) {
-    cat("Fehler beim Bild einbetten:", e$message, "\n")
-  })
-}
-```
-Sant: This marks G (tree image)
-
-
-
-```{r metadata, results='asis'}
-# Metadaten anzeigen falls gewünscht
-if (generation$includeMetadata && !is.null(metadata)) {
-  cat("## Bildmetadaten\n\n")
-  cat("**Aufnahmedatum:** ", as.POSIXct(metadata$dateTime, format="%Y-%m-%dT%H:%M:%S"), "\n\n")
-  cat("**Kamera:** ", metadata$make, " ", metadata$model, "\n\n")
-  cat("**Auflösung:** ", metadata$imageWidth, " x ", metadata$imageHeight, " Pixel\n\n")
-  cat("**Software:** ", metadata$software, "\n\n")
-}
+cat("\\vspace*{8pt}\n \n")  # Some spacing. Adjust as needed
 ```
 
-Sant: This marks J (tree coordinates). L can be added here if Denis sends photographer name in metadata
+
+```{r}
+# Base64-Daten extrahieren (ohne data:image/... prefix)
+base64_data <- sub("^data:image/[^;]+;base64,", "", imageBase64$base64Data)
+
+# Temporäre Bilddatei erstellen
+random_string <- paste0(sample(c(letters, LETTERS, 0:9), 10, replace = TRUE), collapse = "")
+temp_img <- paste0("temp_images/", random_string, ".jpg")
+writeBin(base64enc::base64decode(base64_data), temp_img)
+```
+
 
 
 ```{r qrcode, results='asis'}
-if (generation$includeLocation && !is.null(metadata$gpsLatitude) && !is.null(metadata$gpsLongitude)) {
-      lat_str_decimal <- as.character(metadata$gpsLatitude[[1]] + metadata$gpsLatitude[[2]]/60 + metadata$gpsLatitude[[3]]/3600)
-      lon_str_decimal <- as.character(metadata$gpsLongitude[[1]] + metadata$gpsLongitude[[2]]/60 + metadata$gpsLongitude[[3]]/3600)
-
-      lat_str <- sprintf("%d° %d' %0.2f",
-                   metadata$gpsLatitude[[1]],
-                   metadata$gpsLatitude[[2]],
-                   metadata$gpsLatitude[[3]])
-
-      lon_str <- sprintf("%d° %d' %0.2f",
-                   metadata$gpsLongitude[[1]],
-                   metadata$gpsLongitude[[2]],
-                   metadata$gpsLongitude[[3]])
-    cat("**Standort:** ", lat_str, " / ", lon_str, "\n\n")
-    
-    google_maps_link <- paste0("https://www.google.com/maps/?q=",lat_str_decimal,",",lon_str_decimal)
-
-    # QR-Code anzeigen falls gewünscht
-    if (generation$includeQrCode) {
-      qr_code_data <- NULL
-      
-      tryCatch({
-          # Prüfen ob qrcode Paket verfügbar ist
-          if (!require(qrcode, quietly = TRUE)) {
-            cat("qrcode package not available, skipping QR code generation\n")
-          } else {
-            # Verwende die korrekte Funktion aus dem qrcode Paket
-            qr_code_data <- qr_code(google_maps_link)
-          }
-        }, error = function(e) {
-          cat("Fehler bei QR-Code-Generierung:", e$message, "\n")
-        })
-      }
-      
-    
-      cat("## QR-Code\n\n")
-      plot(qr_code_data, col = c("white", "black"), 
-           main = "Scan für Zertifikatsdetails", 
-           cex.main = 0.8)
-    
-    cat("Link: ", google_maps_link, "\n\n")
-  } else {
-    cat("TODO: ERROR No valid coordinates found\n")
+if ( !is.null(metadata$gpsLatitude) && !is.null(metadata$gpsLongitude) ){
+  lat_decimal = round(metadata$gpsLatitude[[1]] + metadata$gpsLatitude[[2]]/60 + metadata$gpsLatitude[[3]]/3600, 6)
+  if( metadata$gpsLatitudeRef == 'S' ) # Negative if latitude was South
+  {
+    lat_decimal = -lat_decimal
   }
+  lat_str_decimal <- as.character(lat_decimal)
+  
+  lon_decimal <- round(metadata$gpsLongitude[[1]] + metadata$gpsLongitude[[2]]/60 + metadata$gpsLongitude[[3]]/3600, 6)
+  if( metadata$gpsLongitudeRef == 'W' ) # Negative if longitude was West
+  {
+    lon_decimal = -lon_decimal
+  }
+  lon_str_decimal <- as.character(lon_decimal)
+  
+  lat_str <- sprintf("%d° %d' %0.2f %s",
+               metadata$gpsLatitude[[1]],
+               metadata$gpsLatitude[[2]],
+               metadata$gpsLatitude[[3]],
+               metadata$gpsLatitudeRef)
+  
+  lon_str <- sprintf("%d° %d' %0.2f %s",
+               metadata$gpsLongitude[[1]],
+               metadata$gpsLongitude[[2]],
+               metadata$gpsLongitude[[3]],
+               metadata$gpsLongitudeRef)
+  
+} else if ( !is.null(location$latitudeDecimal) && !is.null(location$longitudeDecimal) ) {
+  lat_str_decimal <- as.character(location$latitudeDecimal)
+  lon_str_decimal <- as.character(location$longitudeDecimal)
+  
+  lat_str <- sapply(location$latitudeDecimal, function(lat) {
+    deg <- floor(abs(lat))
+    min <- floor((abs(lat) - deg) * 60)
+    sec <- round(((abs(lat) - deg) * 60 - min) * 60, 2)
+    paste0(deg, "°", min, "'", sec, "\" ", ifelse(lat >= 0, "N", "S"))
+  })
+  
+  lon_str <- sapply(location$longitudeDecimal, function(lon) {
+    deg <- floor(abs(lon))
+    min <- floor((abs(lon) - deg) * 60)
+    sec <- round(((abs(lon) - deg) * 60 - min) * 60, 2)
+    paste0(deg, "°", min, "'", sec, "\" ", ifelse(lon >= 0, "E", "W"))
+  })
+
+} else {
+  stop("Coordinates are not present in either .metadata or .location!")
+}
+google_maps_link <- paste0("https://www.google.com/maps/?q=",lat_str_decimal,",",lon_str_decimal)
+
+#TODO: Include the location link
 ```
-Sant: This marks 'I' (Both qr code and google maps link)
-
-
----
-*Dieses Zertifikat wurde automatisch generiert und ist gültig bis zum angegebenen Datum.*
 
 
 
-Sant: Items left:
-L - tree photographer, Dennis should add this to the metadata and use it from there
+```{r metadata}
+metadata_to_show_latex <- paste0(
+      "\\textbf{Fotograf(in):} ", certificate$photographer, "\\\\",
+      "\\textbf{Aufnahmedatum:} ", as.POSIXct(metadata$dateTime, format="%Y-%m-%dT%H:%M:%S"), "\\\\",
+      "\\textbf{Kamera:} ", metadata$make, " ", metadata$model, "\\\\",
+      "\\textbf{Auflösung:} ", metadata$imageWidth, " x ", metadata$imageHeight, " Pixel\\\\",
+      "\\textbf{Software:} ", metadata$software, "\\\\",
+      "\\textbf{Standort:} ", lat_str, " , ", lon_str, "\\\\",
+      "\\vspace{0.2cm}", # small vertical space
+      "\\textbf{Google Maps-Link:} ", google_maps_link, "\\\\"
+    )
 
-Cleanup in the handler code (api.R)
+qr_img = paste0("temp_images/qr_", random_string, ".png")
+#generate_svg(qr_code(google_maps_link), qr_img)
+
+# Store the QR code in a separate PNG file
+png(qr_img, width = 250, height = 250)
+plot(qr_code(google_maps_link))
+invisible(dev.off())      # The invisible is VERY VERY VERY IMPORTANT. Otherwise you get two extra lines saying PDF and 2
+```
+
+
+```{r results='asis', eval=TRUE}
+# G(tree image), I(QR Code with link to tree location),
+# metadata_to_show_latex contains: L(photographer name), J(tree coordinates)
+
+cat(sprintf(
+  '\\centeredTwoCol{\\includegraphics[width=\\linewidth]{%s}}{%% RIGHT COLUMN
+    %s
+    \\vspace{1em}
+    \\includegraphics[width=0.4\\linewidth]{%s}
+  }',
+  temp_img,
+  metadata_to_show_latex,
+  qr_img
+))
+```
+
+
+```{r fig.align='right', out.width='30%', fig.show='hold', results='asis', eval=FALSE}
+# Latex for dynamically generated content
+# LEFT (tree image) | Right (tree metadata and location)
+
+cat('
+\\noindent
+\\begin{minipage}[c]{0.45\\textwidth}
+  \\centering
+  \\includegraphics[width=\\linewidth]{', temp_img, '}
+\\end{minipage}
+\\hfill
+\\begin{minipage}[c]{0.50\\textwidth}
+')
+
+# Metadata text (markdown works inside Rmd here)
+cat(metadata_to_show, "\n\n")
+
+cat('\\end{minipage}\\par')
+
+cat("\\vspace*{8pt}\n \n")  # Some spacing. Adjust as needed
+```
+
+
+
+## Level-2 heading to test
+
+```{r, results='asis'}
+# H (Static text content of the certificate)
+# Add \textbf{bold} and \emph{italic} or \underline{underlined} content like this.
+
+text <- readLines("static_content/static_text.txt")
+cat(paste(text, collapse = "\n"))
+```
+
+```{r results='asis'}
+# Finally, the signatures
+signature1_path <- "static_content/signature_1_png.png"
+name1 <- "Dr. Stephen Strange"
+role1 <- "Sorcerer Supreme"
+
+signature2_path <- "static_content/signature_2_png.png"
+name2 <- "Dr. Bruce Banner"
+role2 <- "Labourer, Avengers tower"
+
+cat(sprintf(
+  '\\signatureBlock{%s}{%s}{%s}{%s}{%s}{%s}',
+  signature1_path, name1, role1,
+  signature2_path, name2, role2
+))
+```
