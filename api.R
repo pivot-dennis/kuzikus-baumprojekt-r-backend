@@ -65,9 +65,10 @@ pr$handle("POST", "/generate-certificate", function(req, res){
         quiet = FALSE,  # Zeige Logs
         params = list(
           certificate = body$certificate,
-          imageBase64 = body$image$base64Data,
+          imageBase64 = body$image,
           metadata = body$metadata,
-          generation = body$generation
+          generation = body$generation,
+          location = body$location
         )
       )
     }, error = function(e) {

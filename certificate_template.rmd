@@ -12,6 +12,7 @@ params:
   imageBase64: null
   metadata: null
   generation: null
+  location: null
 ---
 
 

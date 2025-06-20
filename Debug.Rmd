@@ -1,0 +1,73 @@
+
+---
+title: "Untitled"
+author: "Santhosh"
+date: "2025-06-20"
+output: pdf_document
+
+params:
+  certificate: null
+  imageBase64: null
+  metadata: null
+  generation: null
+  location: null
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(base64enc)
+library(qrcode)
+library(knitr)
+```
+
+```{r}
+library(jsonlite)
+
+
+# Parameter extrahieren
+certificate <- params$certificate
+imageBase64 <- params$image
+metadata <- params$metadata
+generation <- params$generation
+location <- params$location
+```
+
+## Certificate
+
+```{r}
+print(str(certificate))
+print(certificate)
+```
+
+## Metadata
+
+```{r}
+print(str(metadata))
+print(metadata)
+```
+
+## Generation
+
+```{r}
+print(str(generation))
+print(generation)
+```
+
+## Location
+
+```{r}
+print(str(location))
+print(location)
+```
+
+
+## Image
+
+```{r}
+print(str(imageBase64))
+print(imageBase64)
+```
