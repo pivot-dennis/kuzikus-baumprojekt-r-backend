@@ -1,0 +1,9 @@
+This part is static. Add \textbf{bold} and \emph{italic} or \underline{underlined} content like this.
+
+This \textbf{certifies} that the tree referenced in this document exists at its designated location. The presence of this tree has been verified and documented as part of the project.
+
+For environmental reasons, this tree must not be cut down, removed, or harmed. Its continued existence supports local biodiversity, carbon sequestration, and the health of the ecosystem.
+
+Preserving this tree is important for current and future generations.
+
+Certified by Kuzikus Baumprojekt Team on June 2024.
