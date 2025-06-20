@@ -46,8 +46,8 @@ cat("\\markright{",
       "Besitzer: ", certificate$owner, "\\\\",
       "Anlass: ", certificate$occasion, "\\\\",
       "Baum: ", certificate$treeId, "\\\\",
-      "Gültig bis: ", certificate$expiryDate, "\\\\",
-      "Erstellt am: ", as.Date(certificate$createdAt), "\\\\"
+      "Erstellt am: ", as.Date(certificate$createdAt), "\\\\",
+      "Gültig bis: ", certificate$expiryDate, "\\\\"
     ),
     "}")
 # use \\\\ for new line in \markright
@@ -127,10 +127,6 @@ google_maps_link <- paste0("https://www.google.com/maps/?q=",lat_str_decimal,","
 ```{r metadata}
 metadata_to_show_latex <- paste0(
       "\\textbf{Fotograf(in):} ", certificate$photographer, "\\\\",
-      "\\textbf{Aufnahmedatum:} ", as.POSIXct(metadata$dateTime, format="%Y-%m-%dT%H:%M:%S"), "\\\\",
-      "\\textbf{Kamera:} ", metadata$make, " ", metadata$model, "\\\\",
-      "\\textbf{Auflösung:} ", metadata$imageWidth, " x ", metadata$imageHeight, " Pixel\\\\",
-      "\\textbf{Software:} ", metadata$software, "\\\\",
       "\\textbf{Standort:} ", lat_str, " , ", lon_str, "\\\\",
       "\\vspace{0.2cm}", # small vertical space
       "\\textbf{Google Maps-Link:} ", google_maps_link, "\\\\"
