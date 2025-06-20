@@ -147,7 +147,7 @@ invisible(dev.off())      # The invisible is VERY VERY VERY IMPORTANT. Otherwise
 # metadata_to_show_latex contains: L(photographer name), J(tree coordinates)
 
 cat(sprintf(
-  '\\centeredTwoCol{\\includegraphics[width=\\linewidth]{%s}}{%% RIGHT COLUMN
+  '\\centeredTwoCol{\\includegraphics[height=0.35\\textheight,keepaspectratio]{%s}}{%% RIGHT COLUMN
     %s
     \\vspace{1em}
     \\includegraphics[width=0.4\\linewidth]{%s}
