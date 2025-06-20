@@ -63,21 +63,23 @@
 
 
 % Signature block with adjustable spacing
-\newcommand{\signatureBlock}[6]{%
+\newcommand{\signatureBlock}[8]{%
   \vspace{2em} % Adjust this to set spacing above the signatures
   \noindent
   \begin{minipage}[t]{0.48\textwidth}
     \centering
     \includegraphics[width=50pt]{#1} \\[0.5em]   % Adjust signature size (width) here
     \textbf{#2} \\ 
-    \textit{#3}
+    \textit{#3} \\
+    #4
   \end{minipage}%
   \hfill
   \begin{minipage}[t]{0.48\textwidth}
     \centering
-    \includegraphics[width=50pt]{#4} \\[0.5em]
-    \textbf{#5} \\
-    \textit{#6}
+    \includegraphics[width=50pt]{#5} \\[0.5em]
+    \textbf{#6} \\
+    \textit{#7} \\
+    #8
   \end{minipage}%
   \par
 }

@@ -204,8 +204,8 @@ name2 <- "Berend Reinhard"
 role2 <- "Direktor"
 
 cat(sprintf(
-  '\\signatureBlock{%s}{%s}{%s}{%s}{%s}{%s}',
-  signature1_path, name1, role1,
-  signature2_path, name2, role2
+  '\\signatureBlock{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}',
+  signature1_path, name1, role1, 'Kuzikus Wildlife Reserve',
+  signature2_path, name2, role2, 'Kuzikus Wildlife Reserve'
 ))
 ```
