@@ -196,12 +196,12 @@ cat(paste(text, collapse = "\n"))
 ```{r results='asis'}
 # Finally, the signatures
 signature1_path <- "static_content/signature_1_png.png"
-name1 <- "Dr. Stephen Strange"
-role1 <- "Sorcerer Supreme"
+name1 <- "Dr. Friedrich F. Reinhard"
+role1 <- "Direktor"
 
 signature2_path <- "static_content/signature_2_png.png"
-name2 <- "Dr. Bruce Banner"
-role2 <- "Labourer, Avengers tower"
+name2 <- "Berend Reinhard"
+role2 <- "Direktor"
 
 cat(sprintf(
   '\\signatureBlock{%s}{%s}{%s}{%s}{%s}{%s}',
