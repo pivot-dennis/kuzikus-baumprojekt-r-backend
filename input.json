@@ -22,6 +22,8 @@
     "imageHeight": 3024,
     "gpsLatitude": [9, 33, 12.08],
     "gpsLongitude": [100, 3, 0.53],
+    "gpsLatitudeRef": "N",
+    "gpsLongitudeRef": "E",
     "software": "18.5",
     "copyright": null
   },
@@ -31,5 +33,10 @@
     "includeQrCode": true,
     "includeMetadata": true,
     "includeLocation": true
-  }
+  },
+  "location": {
+        "IF_GPS_NOT_PRESENT_IN_IMAGE_METADATA": null,
+        "latitudeDecimal":9.553356,
+        "longitudeDecimal":100.050147
+    }
 }
