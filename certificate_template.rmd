@@ -46,8 +46,8 @@ cat("\\markright{",
       "Besitzer: ", certificate$owner, "\\\\",
       "Anlass: ", certificate$occasion, "\\\\",
       "Baum: ", certificate$treeId, "\\\\",
-      "Erstellt am: ", as.Date(certificate$createdAt), "\\\\",
-      "Gültig bis: ", certificate$expiryDate, "\\\\"
+      "Erstellt am: ", format(as.Date(certificate$createdAt), "%d.%m.%Y"), "\\\\",
+      "Gültig bis: ", format(as.Date(certificate$expiryDate), "%d.%m.%Y"), "\\\\"
     ),
     "}")
 # use \\\\ for new line in \markright
